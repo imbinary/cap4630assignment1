@@ -47,7 +47,7 @@ public class UCS {
             Node node = que.poll();
             
             // Check for solution
-            if (node.points.size() == 0) {
+            if (node.goals.size() == 0) {
                 System.out.println("Expaned: " + expanded);
                 bestroute = node.path;
                 bestroute.remove(0);
@@ -106,7 +106,7 @@ public class UCS {
 
         public ExplorePairs(Node n) {
             this.length = n.path.size();
-            remainingLen = n.points.size();
+            remainingLen = n.goals.size();
             this.p = n.path.get(n.path.size()-1).getLoc();
         }
     }

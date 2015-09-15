@@ -7,14 +7,14 @@ import java.util.ArrayList;
 public class Node {
 
     public ArrayList<PacCell> path;
-    public HashSet<PacCell> points;
+    public HashSet<PacCell> goals;
 
 
     public Node(PacCell initial, ArrayList<PacCell> goodies) {
         path = new ArrayList<PacCell>();
-        points = new HashSet<PacCell>();
+        goals = new HashSet<PacCell>();
         for (PacCell pc : goodies)
-            points.add(pc);
+            goals.add(pc);
         path.add(initial);
     }
 
@@ -22,17 +22,17 @@ public class Node {
     public Node(PacCell newCell, Node oldNode) {
         path = new ArrayList<PacCell>(oldNode.path);
         path.add(newCell);
-        points = new HashSet<PacCell>();
-        for (PacCell pc : oldNode.points)
-            points.add(pc);
-        points.remove(newCell);
+        goals = new HashSet<PacCell>();
+        for (PacCell pc : oldNode.goals)
+            goals.add(pc);
+        goals.remove(newCell);
     }
 
 
     public boolean isEqual(Node other) {
         if (path.get(path.size()-1) != other.path.get(other.path.size()-1))
             return false;
-        if (!points.equals(other.points))
+        if (!goals.equals(other.goals))
             return false;
         return true;
     }

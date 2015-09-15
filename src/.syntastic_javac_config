@@ -1,0 +1,1 @@
+let g:syntastic_java_javac_classpath = '/home/austin/Workspace/Java/Pac-Man/bin/:/home/austin/Workspace/Java/Pac-Man/lib/PacSimLib.jar'

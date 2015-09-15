@@ -4,13 +4,18 @@ import java.awt.Point;
 import java.util.HashSet;
 import java.util.ArrayList;
 
-public class Node {
+import static pacsim.PacUtils.oppositeFaces;
+import static pacsim.PacUtils.reverse;
+
+public class Node extends PacCell {
 
     public ArrayList<PacCell> path;
     public HashSet<PacCell> goals;
 
 
     public Node(PacCell initial, ArrayList<PacCell> goodies) {
+        super(initial.getX(),initial.getY());
+        super.cost=initial.getCost();
         path = new ArrayList<PacCell>();
         goals = new HashSet<PacCell>();
         for (PacCell pc : goodies)
@@ -20,6 +25,8 @@ public class Node {
 
 
     public Node(PacCell newCell, Node oldNode) {
+        super(newCell.getX(),newCell.getY());
+        super.cost=newCell.getCost();
         path = new ArrayList<PacCell>(oldNode.path);
         path.add(newCell);
         goals = new HashSet<PacCell>();
@@ -37,18 +44,48 @@ public class Node {
         return true;
     }
 
+    // add all in direction until branch
+    public Node expandDirection(Node start, PacFace dir, PacCell[][] grid) {
+
+        Node tmp=start;
+        //check to see if branch
+        while(true) {
+            int open = 0;
+            for (PacFace face : PacFace.values()) {
+                PacCell npc = PacUtils.neighbor(face, tmp, grid);
+                if ((npc != null) && (!(npc instanceof WallCell))) {
+                    if (!oppositeFaces(dir, face)) {
+                        tmp = new Node(npc, tmp);
+                        open++;
+                    }
+                }
+            }
+
+            //check if branch or start node and return
+            if (open > 1 || tmp.isEqual(start)) {
+                return tmp;
+            }
+
+            if (open == 0) {
+                //reverse
+                dir = reverse(dir);
+            }
+        }
+
+    }
 
     public ArrayList<Node> expand(PacCell[][] grid) {
         ArrayList<Node> lst = new ArrayList<Node>();
-        Point p = path.get(path.size()-1).getLoc();
-        if (grid[p.x-1][p.y] instanceof WallCell == false)
-            lst.add(new Node(grid[p.x-1][p.y], this));
-        if (grid[p.x+1][p.y] instanceof WallCell == false)
-            lst.add(new Node(grid[p.x+1][p.y], this));
-        if (grid[p.x][p.y-1] instanceof WallCell == false)
-            lst.add(new Node(grid[p.x][p.y-1], this));
-        if (grid[p.x][p.y+1] instanceof WallCell == false)
-            lst.add(new Node(grid[p.x][p.y+1], this));
+
+        for (PacFace face : PacFace.values()) {
+            PacCell npc = PacUtils.neighbor(face, this, grid);
+            // bounds checking: in grid, not wall , not current node
+            if ((npc != null) && (!( npc instanceof WallCell))){
+                //lst.add(new Node(npc, this));
+                lst.add(expandDirection(new Node(npc, this),face,grid));
+            }
+        }
+
         return lst;
     }
 

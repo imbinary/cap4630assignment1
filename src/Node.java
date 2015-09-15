@@ -54,7 +54,7 @@ public class Node extends PacCell {
             for (PacFace face : PacFace.values()) {
                 PacCell npc = PacUtils.neighbor(face, tmp, grid);
                 if ((npc != null) && (!(npc instanceof WallCell))) {
-                    if (!oppositeFaces(dir, face)) {
+                    if (!dir.equals(face)) {
                         tmp = new Node(npc, tmp);
                         open++;
                     }

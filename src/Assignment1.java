@@ -1,9 +1,9 @@
 /**
  * Created by chris on 8/31/15.
  */
+
 import java.awt.Point;
 import java.io.File;
-import javax.swing.JFileChooser;
 
 import pacsim.PacAction;
 import pacsim.PacCell;
@@ -38,8 +38,6 @@ public class Assignment1 implements PacAction {
         PacCell[][] grid = (PacCell[][]) state;
         PacFace newFace = null;
         PacmanCell pc = PacUtils.findPacman(grid);
-        //System.out.println("Action");
-        // make sure Pacman is in this game
 
         if(pc != null) {
             if (apath == null) {

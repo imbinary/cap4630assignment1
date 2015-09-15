@@ -13,6 +13,7 @@ public class UCS {
     private PriorityQueue<Node> que;
 
 
+    // Constructor
     public UCS(PacCell[][] grid) {
         this.grid = grid;
         PacCell pc = PacUtils.findPacman(grid);
@@ -28,6 +29,7 @@ public class UCS {
     }
 
     
+    // Locates the food dots on the initial board
     private void initGoals() {
         goals = new ArrayList<PacCell>();
         for(int x = 0; x < grid.length; x++) 
@@ -37,11 +39,14 @@ public class UCS {
     }
 
 
+    // Runs uniform cost search
     public void solve() {
         HashSet<ExplorePairs> explored = new HashSet<ExplorePairs>();
         while (que.size() > 0) {
+            // Pop the stack
             Node node = que.poll();
             
+            // Check for solution
             if (node.points.size() == 0) {
                 System.out.println("Expaned: " + expanded);
                 bestroute = node.path;
@@ -51,6 +56,7 @@ public class UCS {
 
             //Add node to explored
             explored.add(new ExplorePairs(node));
+
             expanded++;
             if (expanded%1000 == 0)
                 System.out.println(expanded);
@@ -92,14 +98,15 @@ public class UCS {
     }
 
 
+    // Subclass made to be able to place already visited nodes into HashSet
     class ExplorePairs {
-        int remaining;
+        int remainingLen;
         int length;
         Point p;
 
         public ExplorePairs(Node n) {
-            this.remaining = n.points.size();
             this.length = n.path.size();
+            remainingLen = n.points.size();
             this.p = n.path.get(n.path.size()-1).getLoc();
         }
     }

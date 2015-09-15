@@ -1,7 +1,8 @@
 import pacsim.*;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Point;
+import java.util.HashSet;
+import java.util.ArrayList;
 
 public class Node {
 
@@ -27,6 +28,7 @@ public class Node {
         points.remove(newCell);
     }
 
+
     public boolean isEqual(Node other) {
         if (path.get(path.size()-1) != other.path.get(other.path.size()-1))
             return false;
@@ -34,6 +36,7 @@ public class Node {
             return false;
         return true;
     }
+
 
     public ArrayList<Node> expand(PacCell[][] grid) {
         ArrayList<Node> lst = new ArrayList<Node>();

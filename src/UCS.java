@@ -83,7 +83,7 @@ public class UCS {
 
 
     public PacFace getNextMove(PacmanCell pc) {
-        PacFace newFace;
+        PacFace newFace = null;
         PacCell newNode = bestroute.remove(0);
         System.out.println("moving to: " + newNode.getX() + " " + newNode.getY());
         if (newNode.getX() < pc.getX())
@@ -92,7 +92,7 @@ public class UCS {
             newFace = PacFace.E;
         else if (newNode.getY() < pc.getY())
             newFace = PacFace.N;
-        else
+        else if (newNode.getY() > pc.getY())
             newFace = PacFace.S;
         return newFace;
     }

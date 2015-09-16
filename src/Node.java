@@ -47,29 +47,34 @@ public class Node extends PacCell {
     // add all in direction until branch
     public Node expandDirection(Node start, PacFace dir, PacCell[][] grid) {
 
-        Node tmp=start;
+        Node prev=start;
         //check to see if branch
         while(true) {
             int open = 0;
+            Node next = prev;
             for (PacFace face : PacFace.values()) {
-                PacCell npc = PacUtils.neighbor(face, tmp, grid);
+                PacCell npc = PacUtils.neighbor(face, prev, grid);
                 if ((npc != null) && (!(npc instanceof WallCell))) {
-                    if (!dir.equals(face)) {
-                        tmp = new Node(npc, tmp);
+                    if (!dir.equals(reverse(face))) {
+                        next = new Node(npc, next);
                         open++;
                     }
                 }
-            }
+                if(open >1){
+                    return prev;
+                }
 
+            }
             //check if branch or start node and return
-            if (open > 1 || tmp.isEqual(start)) {
-                return tmp;
+            if (next.isEqual(start)) {
+                return next;
             }
 
             if (open == 0) {
                 //reverse
                 dir = reverse(dir);
             }
+            prev = next;
         }
 
     }

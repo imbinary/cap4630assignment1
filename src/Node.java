@@ -64,7 +64,7 @@ public class Node extends PacCell {
 
             }
             //start node...return
-            if (next.isEqual(start)) {
+            if (next.isEqual(start) || (  grid[next.getX()][next.getY()] instanceof FoodCell) ){
                 return next;
             }
 

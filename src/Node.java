@@ -49,6 +49,8 @@ public class Node extends PacCell {
         while(true) {
             int open = 0;
             Node next = prev;
+            if((  grid[next.getX()][next.getY()] instanceof FoodCell))
+                return next;
             for (PacFace face : PacFace.values()) {
                 PacCell npc = PacUtils.neighbor(face, prev, grid);
                 if ((npc != null) && (!(npc instanceof WallCell))) {

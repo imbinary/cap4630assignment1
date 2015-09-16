@@ -1,10 +1,7 @@
 import pacsim.*;
 
-import java.awt.Point;
 import java.util.HashSet;
 import java.util.ArrayList;
-
-import static pacsim.PacUtils.oppositeFaces;
 import static pacsim.PacUtils.reverse;
 
 public class Node extends PacCell {
@@ -61,11 +58,12 @@ public class Node extends PacCell {
                     }
                 }
                 if(open >1){
+                    //it's a branch return this node
                     return prev;
                 }
 
             }
-            //check if branch or start node and return
+            //start node...return
             if (next.isEqual(start)) {
                 return next;
             }

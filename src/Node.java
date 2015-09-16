@@ -1,182 +1,97 @@
-/**
- * 
- */
+import pacsim.*;
 
-import pacsim.PacCell;
-import pacsim.PacFace;
-import pacsim.PacUtils;
-import pacsim.WallCell;
-
+import java.util.HashSet;
 import java.util.ArrayList;
-import java.util.PriorityQueue;
+import static pacsim.PacUtils.reverse;
 
-/**
- * @author chris
- *
- */
-public class Node extends PacCell implements Comparable{
+public class Node extends PacCell {
 
-	private Node parent;
-	private float G;
-	public PacFace action;
-	public ArrayList<Node> path;
-
-	public Node(PacCell newpc) {
-		super(newpc.getX(),newpc.getY());
-		this.G = 0;
-		super.cost=newpc.getCost();
-		this.path = new ArrayList<Node>();
-	}
+    public ArrayList<PacCell> path;
+    public HashSet<PacCell> goals;
 
 
-	public Node(PacCell newpc, Node curNode) {
-		super(newpc.getX(),newpc.getY());
-		this.G = 0;
-		super.cost=newpc.getCost();
-		this.path = new ArrayList<Node>(curNode.path);
-	}
-
-	/**
-	 * @return the parent
-	 */
-	public Node getParent() {
-		return parent;
-	}
-
-	/**
-	 * @param parent
-	 *            the parent to set
-	 */
-	public void setParent(Node parent) {
-		this.parent = parent;
-	}
-
-	@Override
-	public boolean equals(Object object)
-	{
-        Node other = (Node) object;
-		boolean sameSame = false;
-
-		if (object != null)
-		{
-            if((this.getX()==other.getX()) && (this.getY()==other.getY()))
-			    sameSame = true;
-		}
-
-		return sameSame;
-	}
-
-	@Override
-	public int compareTo(Object arg0) {
-		Node of = (Node) arg0;
-		Float tmp = this.G;
-		Float tmp2 = of.G;
-		//if(x==of.x && y==of.y) return 0;//it is the same node
-		return tmp.compareTo(tmp2);
-
-		//if (getG() < of.getG()) {
-		//	return -1;
-		//} else if (getG() > of.getG()) {
-		//	return 1;
-		//} else {
-		//	return 0;
-		//}
-	}
-
-	public Node copy() {
-		Node node = new Node(this.clone());
-		node.setG(this.G);
-		if(this.parent!=null)
-			node.setParent(this.parent.copy());
-		else
-			node.setParent(null);
-		if(this.action!=null)
-			node.action=this.action;
-
-		node.path = (ArrayList<Node>) this.path.clone();
-		return node;
-	}
-
-	public Node copy(float g) {
-		Node node = new Node(this.clone());
-		node.setG(g);
-		node.setParent(null);
-		if(this.action!=null)
-			node.action=this.action;
-		node.path = (ArrayList<Node>) this.path.clone();
-		return node;
-	}
-
-	public void setG(float f) {
-		this.G=f;
-		
-	}
-	public float getG() {
-		return this.G;
-
-	}
-	public ArrayList<Node> path(){
-		ArrayList<Node> open = new ArrayList<Node>();
-		Node tmp = this;
-		do {
-			open.add(0,tmp.copy());
-			tmp = tmp.getParent();
-
-		} while (tmp != null);
-
-		return open;
-	}
-
-	public ArrayList<Node> path(Node start){
-		ArrayList<Node> open = new ArrayList<Node>();
-		Node tmp = this.copy();
-
-		do {
-			open.add(0,tmp);
-			tmp = tmp.getParent().copy();
-			if(tmp !=null && tmp.equals(start)) {
-				return open;
-			}
-
-		} while (tmp != null);
-		if(open.size()<10)
-			printRoute(open);
-		return open;
-	}
-
-	public void printRoute(ArrayList<Node> path) {
-
-		if (path == null || path.isEmpty()) {
-			return;
-		}
-		for (Node temp : path) {
-			System.out.print(temp.getX() + "," + temp.getY() + " " );
-		}
-		System.out.println(path.size());
-	}
+    public Node(PacCell initial, ArrayList<PacCell> goodies) {
+        super(initial.getX(),initial.getY());
+        super.cost=initial.getCost();
+        path = new ArrayList<PacCell>();
+        goals = new HashSet<PacCell>();
+        for (PacCell pc : goodies)
+            goals.add(pc);
+        path.add(initial);
+    }
 
 
-	public void expandFrontier(PriorityQueue<Node> open, ArrayList<Node> closed, PacCell[][] grid) {
-		for (PacFace face : PacFace.values()) {
-			PacCell npc = PacUtils.neighbor(face, this, grid);
+    public Node(PacCell newCell, Node oldNode) {
+        super(newCell.getX(),newCell.getY());
+        super.cost=newCell.getCost();
+        path = new ArrayList<PacCell>(oldNode.path);
+        path.add(newCell);
+        goals = new HashSet<PacCell>();
+        for (PacCell pc : oldNode.goals)
+            goals.add(pc);
+        goals.remove(newCell);
+    }
 
-			// bounds checking: in grid, not wall , not current node
-			if ((npc != null) && (!( npc instanceof WallCell))){
-				Node tmp = new Node(npc,this);
 
-				//already in closed list
-				if (closed.contains(tmp)) {
-					continue;
-				}
-				if(open.contains(tmp)) {
-					continue;      //all costs one, if its here path is already shorter.
-				}
-				tmp.setParent(this);
-				tmp.setG(this.getG() + 1);
-				tmp.action = face;
-				tmp.path.add(tmp);
-				open.add(tmp);
-			}
-		}
-	}
+    public boolean isEqual(Node other) {
+        if (path.get(path.size()-1) != other.path.get(other.path.size()-1))
+            return false;
+        if (!goals.equals(other.goals))
+            return false;
+        return true;
+    }
+
+    // add all in direction until branch
+    public Node expandDirection(Node start, PacFace dir, PacCell[][] grid) {
+
+        Node prev=start;
+        //check to see if branch
+        while(true) {
+            int open = 0;
+            Node next = prev;
+            if((  grid[next.getX()][next.getY()] instanceof FoodCell))
+                return next;
+            for (PacFace face : PacFace.values()) {
+                PacCell npc = PacUtils.neighbor(face, prev, grid);
+                if ((npc != null) && (!(npc instanceof WallCell))) {
+                    if (!dir.equals(reverse(face))) {
+                        next = new Node(npc, next);
+                        open++;
+                    }
+                }
+                if(open >1){
+                    //it's a branch return this node
+                    return prev;
+                }
+
+            }
+            //start node...return
+            if (next.isEqual(start) || (  grid[next.getX()][next.getY()] instanceof FoodCell) ){
+                return next;
+            }
+
+            if (open == 0) {
+                //reverse
+                dir = reverse(dir);
+            }
+            prev = next;
+        }
+
+    }
+
+    public ArrayList<Node> expand(PacCell[][] grid) {
+        ArrayList<Node> lst = new ArrayList<Node>();
+
+        for (PacFace face : PacFace.values()) {
+            PacCell npc = PacUtils.neighbor(face, this, grid);
+            // bounds checking: in grid, not wall , not current node
+            if ((npc != null) && (!( npc instanceof WallCell))){
+                //lst.add(new Node(npc, this));
+                lst.add(expandDirection(new Node(npc, this),face,grid));
+            }
+        }
+
+        return lst;
+    }
+
 }

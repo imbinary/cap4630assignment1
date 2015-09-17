@@ -1,5 +1,6 @@
 /**
- * Created by chris on 8/31/15.
+ * CAP4630 Fall 2015 Assignment1
+ * Submission for William Orem and Austin Pantoja
  */
 
 import java.awt.Point;

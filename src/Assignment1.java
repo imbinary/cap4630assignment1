@@ -72,6 +72,8 @@ class UCS {
         });
         que.add(n);
         solve();
+        for(PacCell tmp : bestroute)
+            System.out.println("( " + tmp.getX() +","+tmp.getY() +" )");
     }
 
 
@@ -94,7 +96,7 @@ class UCS {
 
             // Check for solution
             if (node.goals.size() == 0) {
-                System.out.println("Expaned: " + expanded);
+                System.out.println("\nNodes Expanded: " + expanded+"\n");
                 bestroute = node.path;
                 bestroute.remove(0);
                 return;
@@ -105,7 +107,7 @@ class UCS {
 
             expanded++;
             if (expanded%1000 == 0)
-                System.out.println(expanded);
+                System.out.println("Nodes Expanded: " + expanded);
 
             for (Node n : node.expand(grid)) {
                 if (!explored.contains(new ExplorePairs(n))) {
@@ -131,7 +133,7 @@ class UCS {
     public PacFace getNextMove(PacmanCell pc) {
         PacFace newFace = null;
         PacCell newNode = bestroute.remove(0);
-        System.out.println("moving to: " + newNode.getX() + " " + newNode.getY());
+        //System.out.println("moving to: " + newNode.getX() + " " + newNode.getY());
         if (newNode.getX() < pc.getX())
             newFace = PacFace.W;
         else if (newNode.getX() > pc.getX())
